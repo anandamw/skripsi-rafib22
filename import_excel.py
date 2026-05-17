@@ -12,7 +12,7 @@ conn = mysql.connector.connect(
 cursor = conn.cursor()
 
 # ─── Load Excel ──────────────────────────────────────────────────────────
-FILE = 'EOQ_ROP_v8_FINAL.xlsx'
+FILE = 'EOQ_ROP_v8_FINAL_updated.xlsx'
 df_bulanan  = pd.read_excel(FILE, sheet_name='Data Bulanan',        header=None)
 df_historis = pd.read_excel(FILE, sheet_name='Data Historis 5 Tahun', header=None)
 

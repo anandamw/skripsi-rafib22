@@ -15,10 +15,12 @@ class PurchaseOrder extends Model
         'status',
         'catatan',
         'user_id',
+        'tanggal_diterima',
     ];
 
     protected $casts = [
         'tanggal' => 'date',
+        'tanggal_diterima' => 'date',
     ];
 
     // Status constants

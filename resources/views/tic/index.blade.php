@@ -42,19 +42,27 @@
                     <!-- Table Section -->
                     <div class="col-lg-12">
                         <div class="table-responsive">
-                            <table class="table table-hover table-bordered align-middle text-center" id="ticTable" style="font-size: 0.85rem;">
+                            <table class="table table-hover table-bordered align-middle text-center" id="ticTable" style="font-size: 0.82rem;">
                                 <thead class="table-light">
                                     <tr>
-                                        <th rowspan="2" class="align-middle text-start">Bahan Baku</th>
+                                        <th rowspan="2" class="align-middle text-start" style="min-width: 220px;">Bahan Baku</th>
                                         <th colspan="2" class="bg-danger bg-opacity-10 text-danger">Kebijakan Saat Ini (F=12x)</th>
-                                        <th colspan="2" class="bg-success bg-opacity-10 text-success">Metode EOQ (Optimal)</th>
-                                        <th rowspan="2" class="align-middle bg-primary bg-opacity-10 text-primary fw-bold">Efisiensi (Penghematan)</th>
+                                        <th colspan="2" class="bg-success bg-opacity-10 text-success fw-bold">Metode EOQ (Optimal)</th>
+                                        <th colspan="2" class="bg-warning bg-opacity-10 text-warning-emphasis">Q Kecil (50% EOQ)</th>
+                                        <th colspan="2" class="bg-info bg-opacity-10 text-info-emphasis">Q Besar (150% EOQ)</th>
+                                        <th rowspan="2" class="align-middle bg-primary bg-opacity-10 text-primary fw-bold">Efisiensi (Hemat Rp)</th>
+                                        <th rowspan="2" class="align-middle bg-primary bg-opacity-10 text-primary fw-bold">Hemat (%)</th>
+                                        <th rowspan="2" class="align-middle bg-success bg-opacity-20 text-success fw-bold" style="min-width: 140px;">Rekomendasi</th>
                                     </tr>
                                     <tr>
                                         <th class="bg-danger bg-opacity-10" title="Kuantitas Order Aktual">Q Aktual</th>
                                         <th class="bg-danger bg-opacity-10 fw-bold" title="Total Inventory Cost Aktual">TIC Konvensional</th>
-                                        <th class="bg-success bg-opacity-10" title="Economic Order Quantity">Q Optimal (EOQ)</th>
+                                        <th class="bg-success bg-opacity-10 fw-bold" title="Economic Order Quantity">Q EOQ</th>
                                         <th class="bg-success bg-opacity-10 fw-bold" title="Total Inventory Cost EOQ">TIC EOQ</th>
+                                        <th class="bg-warning bg-opacity-10" title="Kuantitas 50% EOQ">Q Kecil</th>
+                                        <th class="bg-warning bg-opacity-10" title="TIC Q Kecil">TIC Q Kecil</th>
+                                        <th class="bg-info bg-opacity-10" title="Kuantitas 150% EOQ">Q Besar</th>
+                                        <th class="bg-info bg-opacity-10" title="TIC Q Besar">TIC Q Besar</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -65,8 +73,12 @@
                                         <td class="text-start fw-bold text-dark">{{ $item['kode'] }} - {{ $item['bahan_baku'] }}</td>
                                         <td>{{ number_format($item['q_aktual'], 0, ',', '.') }}</td>
                                         <td class="text-danger fw-bold">Rp {{ number_format($item['tic_aktual'], 0, ',', '.') }}</td>
-                                        <td>{{ number_format($item['q_eoq'], 0, ',', '.') }}</td>
-                                        <td class="text-success fw-bold">Rp {{ number_format($item['tic_eoq'], 0, ',', '.') }}</td>
+                                        <td class="bg-success bg-opacity-10 fw-bold text-success">{{ number_format($item['q_eoq'], 0, ',', '.') }}</td>
+                                        <td class="bg-success bg-opacity-10 fw-bold text-success">Rp {{ number_format($item['tic_eoq'], 0, ',', '.') }}</td>
+                                        <td>{{ number_format($item['q_kecil'], 0, ',', '.') }}</td>
+                                        <td class="text-muted">Rp {{ number_format($item['tic_kecil'], 0, ',', '.') }}</td>
+                                        <td>{{ number_format($item['q_besar'], 0, ',', '.') }}</td>
+                                        <td class="text-muted">Rp {{ number_format($item['tic_besar'], 0, ',', '.') }}</td>
                                         <td class="fw-bold bg-primary bg-opacity-10 text-primary fs-6">
                                             @if($item['efisiensi'] > 0)
                                                 <i class="fas fa-arrow-down text-success me-1"></i>
@@ -75,13 +87,19 @@
                                             @endif
                                             Rp {{ number_format(abs($item['efisiensi']), 0, ',', '.') }}
                                         </td>
+                                        <td class="fw-bold bg-primary bg-opacity-10 text-primary fs-6">
+                                            {{ $item['hemat_persen'] }}%
+                                        </td>
+                                        <td class="fw-bold bg-success bg-opacity-20 text-success">
+                                            <span class="badge bg-success py-2 px-3 fs-6"><i class="fas fa-check-circle me-1"></i> {{ $item['rekomendasi'] }}</span>
+                                        </td>
                                     </tr>
                                     @endforeach
                                 </tbody>
                                 <tfoot>
                                     <tr class="table-light">
-                                        <td colspan="5" class="text-end fw-bold">TOTAL PENGHEMATAN TAHUN {{ $selectedTahun }}:</td>
-                                        <td class="fw-bold fs-5 text-success">Rp {{ number_format($totalPenghematan, 0, ',', '.') }}</td>
+                                        <td colspan="9" class="text-end fw-bold align-middle fs-6">TOTAL PENGHEMATAN TAHUN {{ $selectedTahun }}:</td>
+                                        <td colspan="3" class="fw-bold fs-5 text-success text-start align-middle">Rp {{ number_format($totalPenghematan, 0, ',', '.') }}</td>
                                     </tr>
                                 </tfoot>
                             </table>

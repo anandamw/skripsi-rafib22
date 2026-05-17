@@ -105,7 +105,14 @@ class PurchaseOrderController extends Controller
             'status' => 'required|in:draft,disetujui,dikirim,diterima,dibatalkan',
         ]);
 
-        $po->update(['status' => $validated['status']]);
+        $updateData = ['status' => $validated['status']];
+        
+        // Catat realisasi lead time jika diterima
+        if ($validated['status'] === 'diterima' && is_null($po->tanggal_diterima)) {
+            $updateData['tanggal_diterima'] = now()->format('Y-m-d');
+        }
+
+        $po->update($updateData);
 
         return redirect()->back()
             ->with('success', 'Status PO berhasil diperbarui menjadi "' . ucfirst($validated['status']) . '".');

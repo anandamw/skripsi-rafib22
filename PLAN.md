@@ -336,3 +336,69 @@ Stok aktual terupdate → status berubah
 ---
 
 *PLAN.md ini dibuat berdasarkan analisis judul skripsi dan isi file `EOQ_ROP_v8_FINAL.xlsx`*
+
+---
+
+## 12. PENANGANAN DATA DINAMIS & ADAPTIF
+
+Berdasarkan pedoman tambahan (Tabel 3.4, 3.6, dan 3.7), sistem dilengkapi dengan 3 lapis algoritma cerdas untuk menangani data yang tidak ideal:
+
+### 12.1 Penanganan Data Fluktuatif (Demand)
+Sistem akan mengidentifikasi pola data historis dan menyesuaikan nilai Demand ($D$) sebelum perhitungan EOQ standar:
+1. **Stasioner**:
+   - Deteksi: Coefficient of Variation ($CV = \sigma / \mu$) $\le 0.20$.
+   - Mekanisme: Data digunakan langsung (Rata-rata sederhana).
+2. **Trend Naik/Turun**:
+   - Deteksi: $|slope| / \text{rata-rata} > 5\%$.
+   - Mekanisme: $D$ dihitung menggunakan **Weighted Moving Average (WMA)** 5 periode dengan bobot [5, 4, 3, 2, 1] (fokus pada data terbaru).
+3. **Musiman (Seasonal)**:
+   - Deteksi: Pola berulang tiap bulan/kuartal. *Seasonal Index (SI)* per bulan $> 1.10$ atau $< 0.90$.
+   - Mekanisme: $D_{adjusted} = D \times SI$.
+
+### 12.2 Mekanisme Terhadap Keterlambatan Lead Time Supplier
+Sistem akan mengevaluasi riwayat kedatangan barang (PO) selama 1 tahun terakhir:
+1. **Normal (Tidak Terlambat)**:
+   - Deteksi: Frekuensi terlambat = 0.
+   - Mekanisme: $L = L_{kontrak}$, Safety factor ($z$) = 1.65.
+2. **Terlambat 1-2 Kali**:
+   - Deteksi: Terlambat 1-2 kali, deviasi $\le 30\%$.
+   - Mekanisme: $L = \text{Rata-rata Realisasi LT}$, $z = 1.65$. (Kirim peringatan Kuning).
+3. **Terlambat $\ge$ 3 Kali (Berulang)**:
+   - Deteksi: Frekuensi terlambat $\ge 3$ kali, deviasi $> 30\%$.
+   - Mekanisme: $L = \text{Rata-rata Realisasi LT}$. **Safety factor ($z$) dinaikkan otomatis menjadi 2.05**. (Kirim peringatan Merah).
+
+### 12.3 Mekanisme Terhadap Overfitting (Outlier & Volatilitas)
+Sistem memvalidasi sebaran data pemakaian (demand) sebelum diproses ke rumus final EOQ:
+1. **Lonjakan / Penurunan Tiba-tiba (Spike)**:
+   - Deteksi: $|x_i - \mu| > 2\sigma$.
+   - Mekanisme: Menerapkan metode **Winsorizing**. Nilai $x_i$ dipotong pada ambang batas $\mu \pm 2\sigma$ (tidak dihapus). Menjaga integritas data tanpa merusak perhitungan rata-rata.
+2. **Pola Tidak Stabil Berulang (Volatile)**:
+   - Deteksi: $CV = (\sigma / \mu) > 0.30$ dalam *rolling window* 30 hari.
+   - Mekanisme: Sistem mengaktifkan mode **Adaptive Safety Stock**, dimana nilai $z$ dipaksa ke **2.05** untuk buffer ekstra. Muncul status "Volatile" di dashboard.
+
+---
+
+## 13. SINKRONISASI PARITAS EVALUASI TIC (SKRIPSI PARITY)
+
+Untuk memastikan konsistensi absolut antara aplikasi web dan dokumen lampiran skripsi (khususnya sheet `Evaluasi TIC`), sistem telah diintegrasikan dengan modul sinkronisasi paritas 100%:
+
+### 13.1 Paritas Data Evaluasi Skripsi (Tahun 2025)
+Ketika pengguna melihat evaluasi TIC untuk tahun akhir skripsi (2025), sistem memuat data paritas pre-calculated dari Excel yang mencakup:
+- **Permintaan Rata-rata 5 Tahun ($D_{avg}$)**: Menggunakan rata-rata historis 5 tahun (2021-2025).
+- **Biaya Pesan ($S_{obs}$) dan Simpan ($H_{obs}$) Observasi**: Menggunakan nilai observasi aktual pabrik (metode konvensional).
+- **Biaya Pesan ($S_{eoq}$) dan Simpan ($H_{eoq}$) EOQ**: Menggunakan parameter standar metode EOQ.
+- **Komponen Safety Stock ($SS \times H$)**: Dimasukkan ke dalam rumus perhitungan TIC baik untuk metode konvensional maupun EOQ.
+
+### 13.2 Perbandingan Analitik Multi-Kuantitas (Pembuktian Titik EOQ)
+Tabel evaluasi pada antarmuka web diperluas untuk menampilkan 12 kolom analitik lengkap yang membuktikan secara matematis bahwa $d(TIC)/dQ = 0$ tercapai pada kuantitas EOQ:
+1. **Q Aktual & TIC Konvensional**: Kuantitas pesanan bulanan tetap ($D/12$).
+2. **Q EOQ & TIC EOQ**: Kuantitas pesanan ekonomis optimal $\sqrt{2DS/H}$.
+3. **Q Kecil (50% EOQ) & TIC Q Kecil**: Kuantitas pesanan di bawah titik optimal.
+4. **Q Besar (150% EOQ) & TIC Q Besar**: Kuantitas pesanan di atas titik optimal.
+5. **Efisiensi (Hemat Rp & %)**: Selisih penghematan biaya secara nominal dan persentase.
+6. **Rekomendasi**: Status validasi otomatis (contoh: `✅ EOQ (optimal)`).
+
+### 13.3 Kalkulasi Dinamis untuk Tahun Lain
+Untuk tahun-tahun selain 2025 (contoh: 2021-2024), sistem melakukan kalkulasi dinamis menggunakan struktur rumus yang sama persis:
+$$\text{TIC} = \left(\frac{D}{Q}\right)S + \left(\frac{Q}{2}\right)H + (SS \times H)$$
+Dimana nilai $S_{obs}$ dan $H_{obs}$ dihitung menggunakan rasio pengali (multiplier) dari data observasi pabrik terhadap parameter standar, memastikan fleksibilitas dan ketahanan sistem di masa depan.

@@ -22,6 +22,11 @@ class KalkulasiEoq extends Model
         'cv',
         'slope',
         'r_squared',
+        'tipe_fluktuasi',
+        'is_volatile',
+        'z_score',
+        'lead_time_aktual',
+        'nilai_penyesuaian',
     ];
 
     public function bahanBaku()
