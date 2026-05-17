@@ -189,7 +189,26 @@
                             <div class="fw-bold small">{{ $po->no_po }}</div>
                             <small class="text-muted">{{ $po->tanggal->format('d/m/Y') }} · {{ $po->user->nama ?? '-' }}</small>
                         </div>
-                        <div>{!! $po->status_badge !!}</div>
+                        <div class="d-flex align-items-center gap-2">
+                            <div>{!! $po->status_badge !!}</div>
+                            <div class="d-flex gap-1">
+                                <a href="{{ route('po.show', $po->id) }}" class="btn btn-sm btn-light text-primary" title="Lihat Detail">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                @if($po->status == 'draft')
+                                    @if(auth()->user()->isGudang() || auth()->user()->isManajer())
+                                    <form action="{{ route('po.updateStatus', $po->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('PATCH')
+                                        <input type="hidden" name="status" value="diterima">
+                                        <button class="btn btn-sm btn-primary text-white" title="Terima Barang di Gudang" onclick="return confirm('Konfirmasi terima barang di gudang?')">
+                                            <i class="fas fa-box-open me-1"></i> Terima
+                                        </button>
+                                    </form>
+                                    @endif
+                                @endif
+                            </div>
+                        </div>
                     </div>
                     @endforeach
                 </div>

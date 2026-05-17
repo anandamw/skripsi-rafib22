@@ -89,20 +89,16 @@
             <a href="{{ route('po.index') }}" class="btn btn-light"><i class="fas fa-arrow-left me-2"></i> Kembali</a>
             <div class="d-flex gap-2">
                 @if($po->status == 'draft')
-                <form action="{{ route('po.updateStatus', $po->id) }}" method="POST">
-                    @csrf
-                    @method('PATCH')
-                    <input type="hidden" name="status" value="disetujui">
-                    <button class="btn btn-success" onclick="return confirm('Setujui PO ini?')"><i class="fas fa-check me-2"></i> Setujui</button>
-                </form>
-                <form action="{{ route('po.updateStatus', $po->id) }}" method="POST">
-                    @csrf
-                    @method('PATCH')
-                    <input type="hidden" name="status" value="dibatalkan">
-                    <button class="btn btn-danger" onclick="return confirm('Batalkan PO ini?')"><i class="fas fa-times me-2"></i> Batalkan</button>
-                </form>
+                    @if(auth()->user()->isGudang() || auth()->user()->isManajer())
+                    <form action="{{ route('po.updateStatus', $po->id) }}" method="POST">
+                        @csrf
+                        @method('PATCH')
+                        <input type="hidden" name="status" value="diterima">
+                        <button class="btn btn-primary text-white" onclick="return confirm('Konfirmasi terima barang di gudang?')"><i class="fas fa-box-open me-2"></i> Terima di Gudang</button>
+                    </form>
+                    @endif
                 @endif
-                <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print me-2"></i> Cetak</button>
+                <button class="btn btn-secondary" onclick="window.print()"><i class="fas fa-print me-2"></i> Cetak</button>
             </div>
         </div>
     </div>

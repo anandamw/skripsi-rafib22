@@ -65,7 +65,7 @@ Route::middleware('auth')->group(function () {
     });
 
     // Purchase Order
-    Route::middleware('role:purchasing,manajer')->group(function () {
+    Route::middleware('role:purchasing,manajer,gudang')->group(function () {
         Route::get('/po', [PurchaseOrderController::class, 'index'])->name('po.index');
         Route::get('/po/create', [PurchaseOrderController::class, 'create'])->name('po.create');
         Route::post('/po', [PurchaseOrderController::class, 'store'])->name('po.store');

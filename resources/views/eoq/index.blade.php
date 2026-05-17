@@ -50,6 +50,7 @@
                     <tr>
                         <th rowspan="2" class="align-middle text-start" style="min-width: 220px;">Bahan Baku & Keterangan</th>
                         <th rowspan="2" class="align-middle bg-info bg-opacity-10" style="min-width: 150px;">Arah Fluktuasi</th>
+                        <th rowspan="2" class="align-middle bg-warning bg-opacity-10" style="min-width: 110px;" title="Stok Aktual (Dari Excel)">Stok Aktual</th>
                         <th colspan="3" class="bg-primary bg-opacity-10">Data Demand</th>
                         <th colspan="4" class="bg-success bg-opacity-10">Parameter Optimal</th>
                         <th rowspan="2" class="align-middle bg-light" style="min-width: 140px;">Status Inventori</th>
@@ -192,11 +193,16 @@
                                     elseif ($item->tipe_fluktuasi == 'Stasioner') $fluktuasiColor = 'bg-success';
                                 @endphp
                                 <span class="badge {{ $fluktuasiColor }} rounded-pill" style="font-size: 0.7rem;">{{ $item->tipe_fluktuasi }}</span>
-                                @if($item->is_volatile)
-                                    <span class="badge bg-danger rounded-pill" style="font-size: 0.7rem;"><i class="fas fa-exclamation-triangle"></i> Volatile</span>
-                                @endif
                                 @if($item->lead_time_aktual > $item->bahanBaku->lead_time)
-                                    <span class="badge bg-warning text-dark rounded-pill" style="font-size: 0.7rem;" title="LT Kontrak: {{ $item->bahanBaku->lead_time }}hr"><i class="fas fa-truck"></i> LT Terlambat</span>
+                                    @if($item->z_score >= 2.05 || $item->is_volatile)
+                                        <span class="badge bg-danger rounded-pill" style="font-size: 0.7rem;" title="Terlambat ≥ 3 Kali (Berulang). Respons Sistem: Menghitung ulang ROP & SS dengan L aktual ({{ number_format($item->lead_time_aktual, 1, ',', '.') }} hr), menaikkan z = 2.05 (Service Level 98%), dan mengirim alert evaluasi supplier"><i class="fas fa-radiation"></i> LT Terlambat Berulang (z=2.05)</span>
+                                    @else
+                                        <span class="badge bg-warning text-dark rounded-pill" style="font-size: 0.7rem;" title="Terlambat 1–2 Kali. Respons Sistem: Memperbarui L menggunakan rata-rata realisasi ({{ number_format($item->lead_time_aktual, 1, ',', '.') }} hr), menghitung ulang SS & ROP dengan σ_L aktual"><i class="fas fa-triangle-exclamation"></i> LT Terlambat (1-2x)</span>
+                                    @endif
+                                @elseif($item->is_volatile)
+                                    <span class="badge bg-danger rounded-pill" style="font-size: 0.7rem;" title="Permintaan Volatile (CV > 30%). Respons Sistem: Menaikkan Safety Factor z = 2.05 untuk mencegah stockout"><i class="fas fa-exclamation-triangle"></i> Demand Volatile (z=2.05)</span>
+                                @else
+                                    <span class="badge bg-success rounded-pill" style="font-size: 0.7rem;" title="Kondisi Lead Time Normal (Tidak Terlambat). Respons Sistem: Menggunakan L standar kontrak ({{ $item->bahanBaku->lead_time }} hr)"><i class="fas fa-circle-check"></i> LT Normal</span>
                                 @endif
                             </div>
                             <div class="text-muted small fw-normal mt-1">S: {{ $s_val }} | H: {{ $h_val }} | LT Aktual: {{ $item->lead_time_aktual ?? $item->bahanBaku->lead_time }}hr</div>
@@ -208,6 +214,10 @@
                         </td>
                         <td class="align-middle bg-info bg-opacity-10 text-center">
                             {!! $arah_fluktuasi_html !!}
+                        </td>
+                        <td class="align-middle bg-warning bg-opacity-10 text-center">
+                            <div class="fw-bold text-dark fs-6">{{ number_format($stok, 0, ',', '.') }}</div>
+                            <div class="small text-muted fw-normal mt-1" style="font-size: 0.7rem;">{{ $item->bahanBaku->satuan }}</div>
                         </td>
                         <td class="align-middle">
                             <div class="d-flex flex-column gap-1 justify-content-center">
@@ -266,8 +276,6 @@
                                 <div class="d-flex align-items-center gap-1">
                                     <span class="badge {{ $status_badge_excel }} rounded-pill px-2 py-1" style="font-size: 0.7rem;" title="Status Excel">Excel: {{ $status_text_excel }}</span>
                                 </div>
-                                <hr class="my-1 border-secondary-subtle w-100">
-                                <div class="small text-muted fw-bold" style="font-size: 0.75rem;">Stok: {{ number_format($stok, 0, ',', '.') }}</div>
                             </div>
                         </td>
                     </tr>
@@ -275,9 +283,7 @@
                 </tbody>
 
             </table>
-        </div>
-        
-        <div class="alert alert-info border-0 rounded-3 mt-4 small shadow-sm">
+         <div class="alert alert-info border-0 rounded-3 mt-4 small shadow-sm">
             <h6 class="fw-bold mb-2"><i class="fas fa-info-circle me-2"></i> Keterangan Perbandingan & Status (Web vs Excel):</h6>
             <ul class="mb-0 mt-1" style="line-height: 1.6;">
                 <li><strong>Web (Metode Adaptif Skripsi):</strong> Menggunakan peramalan WMA 5 Periode untuk data Trend, penyesuaian Seasonal Index untuk data Musiman, serta Adaptive Safety Stock (z=2.05) untuk bahan baku yang Volatile atau sering mengalami keterlambatan Lead Time.</li>
@@ -288,9 +294,6 @@
                     <span class="badge bg-success">Aman ✅</span> (Stok ideal di rentang ROP hingga ROP + EOQ), dan 
                     <span class="badge bg-info text-dark">Overstock 📦</span> (Stok berlebih melampaui ROP + EOQ).
                 </li>
-            </ul>
-        </div>
-
     @endif
 </div>
 @endsection

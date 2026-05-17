@@ -68,30 +68,58 @@ class LaporanController extends Controller
         $tahun = $request->query('tahun', date('Y'));
         
         $kalkulasi = KalkulasiEoq::with('bahanBaku')->where('tahun', $tahun)->get();
+        $excelSummary = app(\App\Http\Controllers\TicController::class)->getExcelSummaryData();
 
         $evaluasiTic = [];
         $totalPenghematan = 0;
 
         foreach ($kalkulasi as $item) {
-            $D = $item->d_tahunan;
-            $param = $item->bahanBaku->parameterTahun($tahun);
-            if (!$param) continue;
+            $kode = $item->bahanBaku->kode;
+            $nama = $item->bahanBaku->nama;
 
-            $S = $param->biaya_pesan;
-            $H = $param->biaya_simpan;
-            
-            $q_aktual = max($D / 12, 1);
-            $tic_aktual = (($D / $q_aktual) * $S) + (($q_aktual / 2) * $H);
+            if ($tahun == 2025 && isset($excelSummary[$kode])) {
+                $row = $excelSummary[$kode];
+                $q_aktual = $row['q_obs'];
+                $tic_aktual = $row['tic_lama'];
+                $q_eoq = $row['q_eoq'];
+                $tic_eoq = $row['tic_eoq'];
+                $efisiensi = $row['hemat'];
+            } else {
+                $D = $item->d_tahunan;
+                $param = $item->bahanBaku->parameterTahun($tahun);
+                if (!$param) continue;
 
-            $q_eoq = $item->eoq;
-            $tic_eoq = $q_eoq > 0 ? (($D / $q_eoq) * $S) + (($q_eoq / 2) * $H) : 0;
+                $S_eoq = $param->biaya_pesan;
+                $H_eoq = $param->biaya_simpan;
+                $SS_eoq = $item->safety_stock;
 
-            $efisiensi = $tic_aktual - $tic_eoq;
+                $s_mult = 1.15;
+                $h_mult = 1.08;
+                if (isset($excelSummary[$kode])) {
+                    if ($excelSummary[$kode]['s_eoq'] > 0) {
+                        $s_mult = $excelSummary[$kode]['s_obs'] / $excelSummary[$kode]['s_eoq'];
+                    }
+                    if ($excelSummary[$kode]['h_eoq'] > 0) {
+                        $h_mult = $excelSummary[$kode]['h_obs'] / $excelSummary[$kode]['h_eoq'];
+                    }
+                }
+
+                $S_obs = round($S_eoq * $s_mult);
+                $H_obs = round($H_eoq * $h_mult);
+
+                $q_aktual = max(1, round($D / 12));
+                $tic_aktual = round((($D / $q_aktual) * $S_obs) + (($q_aktual / 2) * $H_obs) + ($SS_eoq * $H_obs));
+
+                $q_eoq = $item->eoq;
+                $tic_eoq = $q_eoq > 0 ? round((($D / $q_eoq) * $S_eoq) + (($q_eoq / 2) * $H_eoq) + ($SS_eoq * $H_eoq)) : 0;
+                $efisiensi = $tic_aktual - $tic_eoq;
+            }
+
             $totalPenghematan += $efisiensi;
 
             $evaluasiTic[] = [
-                'kode' => $item->bahanBaku->kode,
-                'nama' => $item->bahanBaku->nama,
+                'kode' => $kode,
+                'nama' => $nama,
                 'q_aktual' => $q_aktual,
                 'tic_aktual' => $tic_aktual,
                 'q_eoq' => $q_eoq,

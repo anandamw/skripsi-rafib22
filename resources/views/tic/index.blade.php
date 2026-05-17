@@ -52,7 +52,6 @@
                                         <th colspan="2" class="bg-info bg-opacity-10 text-info-emphasis">Q Besar (150% EOQ)</th>
                                         <th rowspan="2" class="align-middle bg-primary bg-opacity-10 text-primary fw-bold">Efisiensi (Hemat Rp)</th>
                                         <th rowspan="2" class="align-middle bg-primary bg-opacity-10 text-primary fw-bold">Hemat (%)</th>
-                                        <th rowspan="2" class="align-middle bg-success bg-opacity-20 text-success fw-bold" style="min-width: 140px;">Rekomendasi</th>
                                     </tr>
                                     <tr>
                                         <th class="bg-danger bg-opacity-10" title="Kuantitas Order Aktual">Q Aktual</th>
@@ -90,15 +89,12 @@
                                         <td class="fw-bold bg-primary bg-opacity-10 text-primary fs-6">
                                             {{ $item['hemat_persen'] }}%
                                         </td>
-                                        <td class="fw-bold bg-success bg-opacity-20 text-success">
-                                            <span class="badge bg-success py-2 px-3 fs-6"><i class="fas fa-check-circle me-1"></i> {{ $item['rekomendasi'] }}</span>
-                                        </td>
                                     </tr>
                                     @endforeach
                                 </tbody>
                                 <tfoot>
                                     <tr class="table-light">
-                                        <td colspan="9" class="text-end fw-bold align-middle fs-6">TOTAL PENGHEMATAN TAHUN {{ $selectedTahun }}:</td>
+                                        <td colspan="8" class="text-end fw-bold align-middle fs-6">TOTAL PENGHEMATAN TAHUN {{ $selectedTahun }}:</td>
                                         <td colspan="3" class="fw-bold fs-5 text-success text-start align-middle">Rp {{ number_format($totalPenghematan, 0, ',', '.') }}</td>
                                     </tr>
                                 </tfoot>

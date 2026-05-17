@@ -96,7 +96,7 @@
     </div>
     @endif
 
-    @if(auth()->user()->isPurchasing() || auth()->user()->isManajer())
+    @if(auth()->user()->isPurchasing() || auth()->user()->isManajer() || auth()->user()->isGudang())
     <!-- Laporan Purchase Order -->
     <div class="col-md-6 col-lg-4">
         <div class="card border-0 shadow-sm h-100">

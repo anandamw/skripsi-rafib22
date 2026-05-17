@@ -21,7 +21,7 @@ class StokSeeder extends Seeder
             return;
         }
 
-        // Add some initial stock for each material
+        // Simulasi stok awal operasional gudang (Terpisah dari data Excel skripsi)
         foreach ($bahanBakus as $bahan) {
             $initialStock = 0;
             if ($bahan->kode === 'BB001') {
@@ -40,7 +40,7 @@ class StokSeeder extends Seeder
                 'bahan_baku_id' => $bahan->id,
                 'tipe' => 'masuk',
                 'jumlah' => $initialStock,
-                'keterangan' => 'Stok awal sistem (Seeder)',
+                'keterangan' => 'Stok awal operasional (Simulasi Gudang)',
                 'user_id' => $adminGudang->id,
                 'tanggal' => date('Y-m-d'),
             ]);
