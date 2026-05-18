@@ -122,8 +122,23 @@
             color: #adb5bd;
         }
 
+        .input-group-text.toggle-password {
+            border-left: none;
+            border-right: 1px solid #e0e0e0;
+            cursor: pointer;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
         .form-control-with-icon {
             border-left: none;
+        }
+
+        .form-control.password-input {
+            border-right: none;
+        }
+
+        .form-control.password-input:focus + .toggle-password {
+            border-color: var(--accent-blue);
         }
 
         @media (max-width: 768px) {
@@ -186,7 +201,10 @@
                     <label class="form-label small fw-bold text-muted text-uppercase">Kata Sandi</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                        <input type="password" name="password" class="form-control form-control-with-icon" placeholder="••••••••" required>
+                        <input type="password" name="password" id="password" class="form-control form-control-with-icon password-input" placeholder="••••••••" required>
+                        <span class="input-group-text toggle-password" id="togglePassword">
+                            <i class="fas fa-eye"></i>
+                        </span>
                     </div>
                 </div>
 
@@ -229,6 +247,28 @@
     </script>
     @endif
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const togglePassword = document.querySelector('#togglePassword');
+            const password = document.querySelector('#password');
+
+            if (togglePassword && password) {
+                togglePassword.addEventListener('click', function () {
+                    const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                    password.setAttribute('type', type);
+
+                    const icon = this.querySelector('i');
+                    if (type === 'text') {
+                        icon.classList.remove('fa-eye');
+                        icon.classList.add('fa-eye-slash');
+                    } else {
+                        icon.classList.remove('fa-eye-slash');
+                        icon.classList.add('fa-eye');
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>
