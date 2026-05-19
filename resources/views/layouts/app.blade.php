@@ -152,7 +152,7 @@
                         </div>
                         <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-3 rounded-3">
                             <li><h6 class="dropdown-header">Manajemen Akun</h6></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-user-circle me-2 text-muted"></i> Profil Saya</a></li>
+                            <li><a class="dropdown-item" href="{{ route('profile.index') }}"><i class="fas fa-user-circle me-2 text-muted"></i> Profil Saya</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <form action="{{ route('logout') }}" method="POST">

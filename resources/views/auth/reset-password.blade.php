@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - SI Persediaan JJ Top Cosmindo</title>
+    <title>Atur Ulang Kata Sandi - SI Persediaan JJ Top Cosmindo</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- FontAwesome Icons -->
@@ -188,43 +188,39 @@
             </div>
         </div>
 
-        <!-- Login Form -->
+        <!-- Reset Password Form -->
         <div class="login-form-container">
-            <h3 class="fw-bold mb-1">Selamat Datang</h3>
-            <p class="text-muted mb-4">Silakan masuk ke akun Anda</p>
+            <h3 class="fw-bold mb-1">Atur Ulang Kata Sandi</h3>
+            <p class="text-muted mb-4 small">Silakan masukkan kata sandi baru untuk akun Anda.</p>
 
-            <form action="{{ route('login.process') }}" method="POST">
+            <form action="{{ route('password.update') }}" method="POST">
                 @csrf
-                <div class="mb-3">
-                    <label class="form-label small fw-bold text-muted text-uppercase">Alamat Email</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                        <input type="email" name="email" class="form-control form-control-with-icon" placeholder="nama@perusahaan.com" required value="{{ old('email') }}">
-                    </div>
-                </div>
+                <input type="hidden" name="token" value="{{ $token }}">
+                <input type="hidden" name="email" value="{{ $email }}">
 
                 <div class="mb-3">
-                    <label class="form-label small fw-bold text-muted text-uppercase">Kata Sandi</label>
+                    <label class="form-label small fw-bold text-muted text-uppercase">Kata Sandi Baru</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                        <input type="password" name="password" id="password" class="form-control form-control-with-icon password-input" placeholder="••••••••" required>
+                        <input type="password" name="password" id="password" class="form-control form-control-with-icon password-input" placeholder="••••••••" required minlength="8">
                         <span class="input-group-text toggle-password" id="togglePassword">
                             <i class="fas fa-eye"></i>
                         </span>
                     </div>
                 </div>
 
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="remember" id="remember">
-                        <label class="form-check-label small text-muted" for="remember">
-                            Ingat Saya
-                        </label>
+                <div class="mb-4">
+                    <label class="form-label small fw-bold text-muted text-uppercase">Konfirmasi Kata Sandi</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                        <input type="password" name="password_confirmation" id="password_confirmation" class="form-control form-control-with-icon password-input" placeholder="••••••••" required minlength="8">
+                        <span class="input-group-text toggle-password" id="togglePasswordConfirm">
+                            <i class="fas fa-eye"></i>
+                        </span>
                     </div>
-                    <a href="{{ route('password.request') }}" class="small text-decoration-none fw-semibold" style="color: var(--primary-navy);">Lupa Kata Sandi?</a>
                 </div>
 
-                <button type="submit" class="btn btn-login w-100 mb-3">MASUK KE DASHBOARD</button>
+                <button type="submit" class="btn btn-login w-100 mb-3">SIMPAN KATA SANDI BARU</button>
             </form>
             
             <p class="text-center small text-muted mt-auto">© 2024 PT. JJ Top Cosmindo Sidoarjo</p>
@@ -242,28 +238,44 @@
     </script>
     @endif
 
-    @if(session('success'))
+    @if($errors->any())
     <script>
         Swal.fire({
-            icon: 'success',
-            title: 'Berhasil!',
-            text: '{{ session('success') }}',
-            timer: 3000,
-            showConfirmButton: false
+            icon: 'error',
+            title: 'Validasi Gagal',
+            text: '{{ $errors->first() }}',
+            confirmButtonColor: '#1a337e'
         });
     </script>
     @endif
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Toggle Password 1
             const togglePassword = document.querySelector('#togglePassword');
             const password = document.querySelector('#password');
-
             if (togglePassword && password) {
                 togglePassword.addEventListener('click', function () {
                     const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
                     password.setAttribute('type', type);
+                    const icon = this.querySelector('i');
+                    if (type === 'text') {
+                        icon.classList.remove('fa-eye');
+                        icon.classList.add('fa-eye-slash');
+                    } else {
+                        icon.classList.remove('fa-eye-slash');
+                        icon.classList.add('fa-eye');
+                    }
+                });
+            }
 
+            // Toggle Password 2
+            const togglePasswordConfirm = document.querySelector('#togglePasswordConfirm');
+            const passwordConfirm = document.querySelector('#password_confirmation');
+            if (togglePasswordConfirm && passwordConfirm) {
+                togglePasswordConfirm.addEventListener('click', function () {
+                    const type = passwordConfirm.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordConfirm.setAttribute('type', type);
                     const icon = this.querySelector('i');
                     if (type === 'text') {
                         icon.classList.remove('fa-eye');

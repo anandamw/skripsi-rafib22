@@ -86,4 +86,30 @@ class UserController extends Controller
         $statusMsg = $user->aktif ? 'diaktifkan kembali' : 'dinonaktifkan';
         return redirect()->route('user.index')->with('success', 'Akun user berhasil ' . $statusMsg . '.');
     }
+
+    /**
+     * Tampilkan halaman profil pengguna yang sedang login.
+     */
+    public function profile()
+    {
+        $user = auth()->user();
+        return view('profile.index', compact('user'));
+    }
+
+    /**
+     * Perbarui kata sandi pengguna tanpa meminta kata sandi lama.
+     */
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $user = auth()->user();
+        $user->update([
+            'password' => Hash::make($request->password)
+        ]);
+
+        return redirect()->route('profile.index')->with('success', 'Kata sandi Anda berhasil diperbarui.');
+    }
 }

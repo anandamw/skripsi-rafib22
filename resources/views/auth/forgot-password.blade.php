@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - SI Persediaan JJ Top Cosmindo</title>
+    <title>Lupa Kata Sandi - SI Persediaan JJ Top Cosmindo</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- FontAwesome Icons -->
@@ -188,14 +188,20 @@
             </div>
         </div>
 
-        <!-- Login Form -->
+        <!-- Forgot Password Form -->
         <div class="login-form-container">
-            <h3 class="fw-bold mb-1">Selamat Datang</h3>
-            <p class="text-muted mb-4">Silakan masuk ke akun Anda</p>
+            <div class="mb-4">
+                <a href="{{ route('login') }}" class="text-decoration-none small fw-semibold" style="color: var(--primary-navy);">
+                    <i class="fas fa-arrow-left me-1"></i> Kembali ke Login
+                </a>
+            </div>
 
-            <form action="{{ route('login.process') }}" method="POST">
+            <h3 class="fw-bold mb-1">Lupa Kata Sandi?</h3>
+            <p class="text-muted mb-4 small">Masukkan alamat email Anda yang terdaftar. Kami akan membuatkan tautan untuk mengatur ulang kata sandi Anda.</p>
+
+            <form action="{{ route('password.email') }}" method="POST">
                 @csrf
-                <div class="mb-3">
+                <div class="mb-4">
                     <label class="form-label small fw-bold text-muted text-uppercase">Alamat Email</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-envelope"></i></span>
@@ -203,28 +209,7 @@
                     </div>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label small fw-bold text-muted text-uppercase">Kata Sandi</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                        <input type="password" name="password" id="password" class="form-control form-control-with-icon password-input" placeholder="••••••••" required>
-                        <span class="input-group-text toggle-password" id="togglePassword">
-                            <i class="fas fa-eye"></i>
-                        </span>
-                    </div>
-                </div>
-
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="remember" id="remember">
-                        <label class="form-check-label small text-muted" for="remember">
-                            Ingat Saya
-                        </label>
-                    </div>
-                    <a href="{{ route('password.request') }}" class="small text-decoration-none fw-semibold" style="color: var(--primary-navy);">Lupa Kata Sandi?</a>
-                </div>
-
-                <button type="submit" class="btn btn-login w-100 mb-3">MASUK KE DASHBOARD</button>
+                <button type="submit" class="btn btn-login w-100 mb-3">KIRIM TAUTAN RESET</button>
             </form>
             
             <p class="text-center small text-muted mt-auto">© 2024 PT. JJ Top Cosmindo Sidoarjo</p>
@@ -242,40 +227,30 @@
     </script>
     @endif
 
-    @if(session('success'))
+    @if(session('reset_url'))
     <script>
         Swal.fire({
             icon: 'success',
-            title: 'Berhasil!',
-            text: '{{ session('success') }}',
-            timer: 3000,
-            showConfirmButton: false
+            title: 'Tautan Reset Terkirim!',
+            html: '<p>Tautan reset kata sandi telah berhasil dibuat untuk email Anda.</p>' +
+                  '<div class="alert alert-info mt-3 text-start small">' +
+                  '<i class="fas fa-info-circle me-1"></i> <strong>Mode Demo Skripsi:</strong><br>' +
+                  'Karena sistem berjalan di lingkungan lokal, klik tombol di bawah ini untuk langsung membuka halaman reset kata sandi.' +
+                  '</div>',
+            showCancelButton: true,
+            confirmButtonText: '<i class="fas fa-external-link-alt me-1"></i> Buka Halaman Reset',
+            cancelButtonText: 'Tutup',
+            confirmButtonColor: '#0d6efd',
+            cancelButtonColor: '#6c757d',
+            allowOutsideClick: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '{!! session('reset_url') !!}';
+            }
         });
     </script>
     @endif
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const togglePassword = document.querySelector('#togglePassword');
-            const password = document.querySelector('#password');
-
-            if (togglePassword && password) {
-                togglePassword.addEventListener('click', function () {
-                    const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-                    password.setAttribute('type', type);
-
-                    const icon = this.querySelector('i');
-                    if (type === 'text') {
-                        icon.classList.remove('fa-eye');
-                        icon.classList.add('fa-eye-slash');
-                    } else {
-                        icon.classList.remove('fa-eye-slash');
-                        icon.classList.add('fa-eye');
-                    }
-                });
-            }
-        });
-    </script>
 </body>
 
 </html>
