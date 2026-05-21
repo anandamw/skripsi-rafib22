@@ -39,8 +39,7 @@ Route::middleware('auth')->group(function () {
     
     // Master Data Bahan Baku (Semua bisa melihat, hanya manajer/purchasing yang bisa kelola)
     Route::get('/bahan-baku', [BahanBakuController::class, 'index'])->name('bahan-baku.index');
-    Route::get('/bahan-baku/{bahan_baku}', [BahanBakuController::class, 'show'])->name('bahan-baku.show');
-    
+   
     Route::middleware('role:gudang')->group(function () {
         Route::get('/bahan-baku/create', [BahanBakuController::class, 'create'])->name('bahan-baku.create');
         Route::post('/bahan-baku', [BahanBakuController::class, 'store'])->name('bahan-baku.store');
