@@ -93,6 +93,7 @@ Route::middleware('auth')->group(function () {
     // Administrator (Manajemen User)
     Route::middleware('role:manajer')->group(function () {
         Route::resource('user', UserController::class)->except(['create', 'show', 'edit']);
+        Route::patch('/user/{user}/toggle', [UserController::class, 'toggle'])->name('user.toggle');
     });
 });
 

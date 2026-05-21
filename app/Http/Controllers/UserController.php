@@ -69,22 +69,33 @@ class UserController extends Controller
     }
 
     /**
-     * Remove or disable the specified user.
+     * Toggle status aktif/nonaktif user.
+     */
+    public function toggle(User $user)
+    {
+        if (auth()->id() === $user->id) {
+            return redirect()->back()->with('error', 'Anda tidak dapat menonaktifkan akun Anda sendiri.');
+        }
+
+        $user->update(['aktif' => !$user->aktif]);
+
+        $statusMsg = $user->aktif ? 'diaktifkan kembali' : 'dinonaktifkan';
+        return redirect()->route('user.index')->with('success', 'Akun "' . $user->nama . '" berhasil ' . $statusMsg . '.');
+    }
+
+    /**
+     * Hapus permanen user dari database.
      */
     public function destroy(User $user)
     {
-        // Cegah manajer menghapus dirinya sendiri
         if (auth()->id() === $user->id) {
-            return redirect()->back()->with('error', 'Anda tidak dapat menonaktifkan akun Anda sendiri yang sedang login.');
+            return redirect()->back()->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
         }
 
-        // Toggle status aktif (Soft disable instead of hard delete)
-        $user->update([
-            'aktif' => !$user->aktif
-        ]);
+        $nama = $user->nama;
+        $user->delete();
 
-        $statusMsg = $user->aktif ? 'diaktifkan kembali' : 'dinonaktifkan';
-        return redirect()->route('user.index')->with('success', 'Akun user berhasil ' . $statusMsg . '.');
+        return redirect()->route('user.index')->with('success', 'Akun "' . $nama . '" berhasil dihapus permanen.');
     }
 
     /**
