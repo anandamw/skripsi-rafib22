@@ -17,11 +17,28 @@ class BahanBakuController extends Controller
     }
 
     /**
+     * Generate kode bahan baku otomatis (BB001, BB002, dst.)
+     */
+    private function generateKode(): string
+    {
+        $last = BahanBaku::orderBy('id', 'desc')->first();
+
+        if (!$last) {
+            return 'BB001';
+        }
+
+        // Ambil angka dari kode terakhir, misal BB012 → 12
+        $number = (int) preg_replace('/[^0-9]/', '', $last->kode);
+        return 'BB' . str_pad($number + 1, 3, '0', STR_PAD_LEFT);
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
-        return view('bahan_baku.create');
+        $kodeOtomatis = $this->generateKode();
+        return view('bahan_baku.create', compact('kodeOtomatis'));
     }
 
     /**

@@ -22,8 +22,7 @@
                     <!-- Basic Info -->
                     <div class="col-md-4">
                         <label class="form-label small fw-bold text-muted">KODE BAHAN</label>
-                        <input type="text" name="kode" class="form-control @error('kode') is-invalid @enderror" value="{{ old('kode', $bahanBaku->kode) }}" required>
-                        @error('kode') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        <input type="text" name="kode" class="form-control" value="{{ old('kode', $bahanBaku->kode) }}" readonly style="background-color: #f8f9fa;">
                     </div>
                     <div class="col-md-8">
                         <label class="form-label small fw-bold text-muted">NAMA BAHAN BAKU</label>
@@ -41,7 +40,19 @@
                     </div>
                     <div class="col-md-6">
                         <label class="form-label small fw-bold text-muted">SATUAN</label>
-                        <input type="text" name="satuan" class="form-control @error('satuan') is-invalid @enderror" value="{{ old('satuan', $bahanBaku->satuan) }}" required>
+                        <select name="satuan" class="form-select @error('satuan') is-invalid @enderror" required>
+                            <option value="">Pilih Satuan...</option>
+                            <option value="Kg"     {{ old('satuan', $bahanBaku->satuan) == 'Kg'     ? 'selected' : '' }}>Kg (Kilogram)</option>
+                            <option value="Gram"   {{ old('satuan', $bahanBaku->satuan) == 'Gram'   ? 'selected' : '' }}>Gram</option>
+                            <option value="Liter"  {{ old('satuan', $bahanBaku->satuan) == 'Liter'  ? 'selected' : '' }}>Liter</option>
+                            <option value="mL"     {{ old('satuan', $bahanBaku->satuan) == 'mL'     ? 'selected' : '' }}>mL (Mililiter)</option>
+                            <option value="Pcs"    {{ old('satuan', $bahanBaku->satuan) == 'Pcs'    ? 'selected' : '' }}>Pcs (Pieces)</option>
+                            <option value="Lusin"  {{ old('satuan', $bahanBaku->satuan) == 'Lusin'  ? 'selected' : '' }}>Lusin</option>
+                            <option value="Karton" {{ old('satuan', $bahanBaku->satuan) == 'Karton' ? 'selected' : '' }}>Karton</option>
+                            <option value="Sak"    {{ old('satuan', $bahanBaku->satuan) == 'Sak'    ? 'selected' : '' }}>Sak</option>
+                            <option value="Drum"   {{ old('satuan', $bahanBaku->satuan) == 'Drum'   ? 'selected' : '' }}>Drum</option>
+                            <option value="Meter"  {{ old('satuan', $bahanBaku->satuan) == 'Meter'  ? 'selected' : '' }}>Meter</option>
+                        </select>
                         @error('satuan') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
 
